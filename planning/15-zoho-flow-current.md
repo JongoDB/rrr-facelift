@@ -33,7 +33,7 @@ Decision: Service Type? ─── Mobile ┐
                                    ├── Decision: Distance == 10? (and similar mileage thresholds)
                                    ├── BuildBatchMileageLine... (script)
                                    ├── Set mileage_over_ten_... (variable)
-                                   ├── Refresh2Zoho (script — re-mints token?)
+                                   ├── Refresh2Zoho (script — purpose unverified; see note 4 below)
                                    │
                               On-Site ┐
                                    │   (skips geocode/mileage)
@@ -85,7 +85,7 @@ The 4 columns I see at zoomed-out level correspond to:
 1. **The intake template auto-generation is owned by THIS flow's "Add comment to estimate/invoice" steps.** When n8n takes over, it must produce the exact same template format (already documented in [planning/06](06-zoho-integration.md) and [planning/14](14-zoho-org-schema.md)) — owners and techs read these comments daily.
 2. **Mileage logic is fully encoded here.** Geocode → driving distance → rounded miles → conditional fee tiers → mileage-line builder. Phase 02's `02-process-intake-form` must reproduce this; the rate constants in [shared/src/constants.ts](../packages/shared/src/constants.ts) match what's already implied (10-mi free radius, $2.70/mi over).
 3. **Per-urgency × per-service-type branching = 4 near-identical pipelines.** The current flow has heavy duplication because Zoho Flow's branching makes shared sub-flows awkward. **n8n can collapse this to one parameterized branch** using sub-workflows or function nodes — much easier to maintain.
-4. **`Refresh2Zoho` and the raw `GET Invoice` / `PUT New Invoice` steps reveal a token-refresh hack.** The flow drops down to direct `https://www.zohoapis.com/books/v3/invoices/{id}` calls because Zoho Flow's built-in Books actions don't support modifying line items after creation cleanly. Our n8n equivalent uses the API directly via the `@rrr/zoho-tools` client we're building — no hack needed.
+4. **The raw `GET Invoice` / `PUT New Invoice` steps work around an API-coverage gap.** Zoho Flow's built-in Books actions don't support modifying line items after creation cleanly, so the flow drops down to direct `https://www.zohoapis.com/books/v3/invoices/{id}` calls. The `Refresh2Zoho` script that sits next to those raw calls is named like a token re-minter, but its body wasn't inspected during the screenshot audit — purpose **unverified**. Either way, our n8n equivalent uses the API directly via the `@rrr/zoho-tools` client (which already handles token caching), so neither the API-coverage workaround nor any token hack is needed.
 5. **`Create task` (Zoho Projects)** is currently part of the pipeline. n8n equivalent must keep that integration unless owner wants to drop it.
 6. **`Enable portal access`** is set on every new customer. Phase 02's contact-creation step must replicate.
 7. **Email notifications** flow through Zoho Mail (uses RRR's Workspace mailbox). Phase 02 sends customer email via Resend (per planning/03), but RRR-internal "new intake" alerts can stay on Workspace via SMTP relay or move to Resend too — owner's call.
@@ -107,7 +107,7 @@ Trigger: Zoho Mail — *Email matching search* (real-time). Branched by *Appoint
 | Zoho Projects action | Defer / replace with Postgres `tasks` table or skip (owner decision) |
 | Decision node | n8n IF / Switch nodes |
 | Variable Set / Function | n8n Set / Function nodes (TS in Code node, or call out to Worker for non-trivial logic) |
-| `Refresh2Zoho` hack | Not needed — `@rrr/zoho-tools` caches token automatically |
+| `Refresh2Zoho` script | Not needed — `@rrr/zoho-tools` caches token automatically and exposes typed entity helpers |
 | `GET / PUT Invoice` raw calls | Worker tools — `add_lines_to_invoice`, etc. |
 
 ## Refreshing this audit

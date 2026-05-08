@@ -15,7 +15,7 @@
 | # | Phase | Status | Wrap-up | Notes |
 |---|-------|--------|---------|-------|
 | 00 | Foundation (repo, infra, creds) | ✅ complete | [phase-00-foundation.md](wrapups/phase-00-foundation.md) | Pushed to JongoDB/rrr-facelift; CI green |
-| 01 | Service catalog + Zoho integration | ✅ complete (locally) | [phase-01-zoho-foundation.md](wrapups/phase-01-zoho-foundation.md) | OAuth client + 17 tool methods + 363-item catalog mirror; PR open |
+| 01 | Service catalog + Zoho integration | ✅ complete (locally) | [phase-01-zoho-foundation.md](wrapups/phase-01-zoho-foundation.md) | OAuth client + 17 tool methods + 364-item catalog mirror; PR open |
 | 02 | n8n self-hosted + intake form workflow | ⬜ pending | — | Starts after PR merge + items #1/#2 below |
 | 03 | Website migration (Squarespace → Astro/CF) | ⬜ pending | — | |
 | 04 | Tech PWA — chat + Zoho tool use | ⬜ pending | — | |
@@ -45,7 +45,7 @@ Resolved (Phase 01):
 
 ## Recently Completed
 
-- **2026-05-08 (Phase 01)** — Service Catalog + Zoho Integration. OAuth client with token cache + retry, `zohoFetch`, 17 typed tool methods (contacts / comments / estimates / invoices / payments / items), 363-item Zoho-canonical catalog mirror via `pnpm sync:catalog`, `buildIntakeTemplate` matching the verbatim format Jonathan posts today. Tests 19 → 69. Two new planning docs (14, 15). Branch `phase-01/zoho-foundation`, 6 commits.
+- **2026-05-08 (Phase 01)** — Service Catalog + Zoho Integration. OAuth client with token cache + retry, `zohoFetch`, 17 typed tool methods (contacts / comments / estimates / invoices / payments / items), 364-item Zoho-canonical catalog mirror via `pnpm sync:catalog`, `buildIntakeTemplate` matching the verbatim format Jonathan posts today. Tests 19 → 83 (after PR-review correctness fixes). Two new planning docs (14, 15). Branch `phase-01/zoho-foundation`, 6 commits.
 - **2026-05-08 (Phase 00)** — Foundation. Monorepo, tooling, infra skeleton, CI. 89 files / 6,409 lines / 5 commits on `main`.
 
 ## Notes
