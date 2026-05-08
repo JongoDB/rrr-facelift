@@ -68,7 +68,6 @@ export async function zohoFetch<T = unknown>(
   const maxAttempts = options.maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
   const baseSleepMs = options.baseSleepMs ?? DEFAULT_BASE_SLEEP_MS;
 
-  // biome-ignore lint/style/noNonNullAssertion: loop body always assigns lastError on failure
   let lastError!: ZohoApiError;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const token = await ctx.getAccessToken();
