@@ -6,14 +6,14 @@
 
 ## Workspace inventory
 
-Two flows live in workspace `default`:
+| Flow | Status | Phase 02 scope | Trigger |
+|------|--------|----------------|---------|
+| **Intake Automation** | **ON** (live) | ✅ in scope — replicate in n8n | Zoho Forms — *New Customer Intake* (real-time) |
+| Appointment Automation | paused | ❌ out of scope — owner confirmed (not migrating) | Zoho Mail — *Email matching search* |
 
-| Flow | Status | Last saved | Trigger | Owner |
-|------|--------|-----------|---------|-------|
-| Intake Automation | **ON** | 2025-12-31 | Zoho Forms — *New Customer Intake* (real-time) | Jonathan |
-| Appointment Automation | **PAUSED** | 2025-07 | Zoho Mail — *Email matching search* (real-time) | Jonathan |
+Only **Intake Automation** is the workflow to worry about. Appointment Automation is intentionally not being migrated; a brief structural snapshot is at the bottom of this doc for archival, but Phase 02 builds nothing for it.
 
-**Connected app surface used across the flows:** Twilio (SMS — listed as a registered connector but not observed wired into the active canvas; available actions are *Fetch message*, *Send SMS or WhatsApp*, *Send templated message*), Zoho Books, Zoho Mail, Zoho Projects.
+**Connected app surface (Intake Automation):** Zoho Books, Zoho Mail, Zoho Projects. Twilio is a registered connector but not wired into the active canvas — Phase 02's "SMS the owner on new intake" plan is an *addition* to current behavior, not a replacement.
 
 ## Intake Automation — high-level architecture
 
@@ -91,36 +91,13 @@ The 4 columns I see at zoomed-out level correspond to:
 7. **Email notifications** flow through Zoho Mail (uses RRR's Workspace mailbox). Phase 02 sends customer email via Resend (per planning/03), but RRR-internal "new intake" alerts can stay on Workspace via SMTP relay or move to Resend too — owner's call.
 8. **No Twilio SMS in the live Intake flow.** Twilio is registered as a connector but the active canvas uses email only. Either SMS was deferred or it's done out-of-band. Phase 02's plan to SMS the owner on new intake is an *addition*, not a replacement.
 
-## Appointment Automation — paused flow
+## Appointment Automation — out of scope (archival snapshot)
 
-```
-Trigger: Zoho Mail — "Email matching search…" (real-time)
-   │
-   ▼
-Decision: Email body / subject ?
-   ├── Appointment Requested ─┐
-   │                          ├── ParseCancellationEmail (script)
-   │                          ├── Set task_name (variable)
-   │                          ├── Fetch task in project (Zoho Projects)
-   │                          ├── Add comment (Zoho Projects)
-   │                          ├── Fetch invoice (Zoho Books)
-   │                          ├── …
-   │                          (mirror branch on the right)
-   │                          
-   ├── Appointment Canceled ──┘
-   │
-   └── Default
-```
+Trigger: Zoho Mail — *Email matching search* (real-time). Branched by *Appointment Requested* / *Appointment Canceled* into mirror pipelines that parsed the email, fetched the matching Zoho Projects task and Zoho Books invoice, and updated them. Currently paused.
 
-A second, parallel branch on the right of the canvas does the same shape — likely the cancellation path versus request path.
+**Owner direction (2026-05-08):** not migrating. Phase 02 builds nothing for this flow. Future appointment handling will route through whatever channel the owner chooses next (likely the Zoho Books Customer Portal or the new tech PWA), not via inbound email parsing.
 
-This flow is **paused**. Plausible reasons (to confirm with the owner):
-- Email-subject matching was unreliable
-- Appointment changes are now handled differently (Zoho Books Customer Portal? manual?)
-
-**For Phase 02:** don't blindly recreate. Ask the owner whether email-driven appointment handling still has a use, or if customer-portal-driven appointments are the future. The intake-form flow already covers initial scheduling.
-
-## Mapping to our n8n target (Phase 02)
+## Mapping Intake Automation to our n8n target (Phase 02)
 
 | Zoho Flow node type | n8n equivalent |
 |---------------------|----------------|
