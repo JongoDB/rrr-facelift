@@ -4,17 +4,17 @@
 
 ## Current State
 
-- **Active Phase:** `phase-00-foundation`
-- **Last Completed:** Phase 00 — Foundation (locally; CI verification pending GitHub remote)
-- **Status:** ✅ complete locally · 🔴 blocked on human inputs before Phase 01 begins
+- **Active Phase:** `phase-00-foundation` ✅ complete (all exit criteria met, CI green)
+- **Repo:** [JongoDB/rrr-facelift](https://github.com/JongoDB/rrr-facelift) (public)
 - **Wrap-up:** [wrapups/phase-00-foundation.md](wrapups/phase-00-foundation.md)
+- **Status:** 🟡 awaiting Phase 01 unblockers (Zoho OAuth + catalog-source decision)
 - **Blockers:** see "Active Blockers" below
 
 ## Phase Tracker
 
 | # | Phase | Status | Wrap-up | Notes |
 |---|-------|--------|---------|-------|
-| 00 | Foundation (repo, infra, creds) | ✅ complete | [phase-00-foundation.md](wrapups/phase-00-foundation.md) | 5 commits on `main`; CI green pending push |
+| 00 | Foundation (repo, infra, creds) | ✅ complete | [phase-00-foundation.md](wrapups/phase-00-foundation.md) | Pushed to JongoDB/rrr-facelift; CI green |
 | 01 | Service catalog + Zoho integration | ⬜ pending | — | Awaits unblockers (Zoho OAuth, rates, tax rate) |
 | 02 | n8n self-hosted + intake form workflow | ⬜ pending | — | |
 | 03 | Website migration (Squarespace → Astro/CF) | ⬜ pending | — | |
@@ -26,19 +26,19 @@
 
 ## Active Blockers
 
-Gating Phase 01 (full detail in [wrapups/phase-00-foundation.md](wrapups/phase-00-foundation.md)):
+Gating Phase 01:
 
-1. **GitHub repo location decision + push** — needed to verify CI pipeline.
-2. **Zoho OAuth credentials** — `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`, `ZOHO_ORG_ID`, `ZOHO_REGION`.
-3. **Confirmed catalog rates / Zoho-first sync decision** — see Phase 01 plan; if RRR's Zoho org already holds the items with real rates, we PULL from Zoho rather than asking the owner to re-enter them.
-4. **Sandbox vs production Zoho org** decision.
+1. **Zoho OAuth credentials** in [apps/api/.env.local](apps/api/.env.local) (gitignored; placeholders already in place) — `ZOHO_REFRESH_TOKEN`, `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_ORG_ID`, `ZOHO_REGION` (likely `com`).
+2. **Catalog-source direction** — confirm whether RRR's Zoho Books org already carries the service items with real rates. If yes (likely), Phase 01 PULLs Zoho → mirrors locally; the placeholder `rate: 0` entries get overwritten from Zoho. If not, we PUSH the placeholder catalog and you fill in rates first.
+3. **Sandbox vs production Zoho org** — assume production with `[TEST]` cleanup tagging unless told otherwise.
 
-Cosmetic (not Phase-01-blocking, useful early):
+Useful early (not Phase-01-blocking):
 
-5. **Shop address + lat/long** — for `SHOP_ADDRESS`/`SHOP_LATITUDE`/`SHOP_LONGITUDE` env vars used in Phase 02 mileage calc.
+4. **Shop address + lat/long** — for `SHOP_ADDRESS`/`SHOP_LATITUDE`/`SHOP_LONGITUDE` (Phase 02 mileage calc).
 
 Resolved:
 
+- ✅ **GitHub repo created** ([JongoDB/rrr-facelift](https://github.com/JongoDB/rrr-facelift)) and CI green.
 - ✅ **NC + Rowan County tax rate** — set to 6.75% in `QUOTE_RULES.taxRate`. Zoho Books remains the system of record for actual tax application.
 
 ## Recently Completed
