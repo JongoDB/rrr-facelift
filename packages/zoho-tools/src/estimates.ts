@@ -119,8 +119,17 @@ export async function getEstimate(
 }
 
 /**
- * Append line items to an existing draft estimate. Errors if the estimate is
- * already sent or accepted (Zoho enforces this).
+ * Append line items to an existing draft estimate. Per Zoho's docs, modifying
+ * sent or accepted estimates is rejected server-side; we don't verify that
+ * locally (would add a round-trip) — let Zoho's response surface the error.
+ *
+ * Why this is a fetch-then-PUT: Zoho's PUT /estimates/:id replaces the entire
+ * `line_items` array, and any line item in the body that lacks a `line_item_id`
+ * is treated as a NEW line (the existing one is deleted and recreated with a
+ * fresh ID). To preserve existing lines on amendment, we fetch them first and
+ * forward each `line_item_id` back through. Without this, every amendment
+ * deletes the original lines and orphans any cached references / clutters the
+ * audit log with full-replacement entries.
  */
 export async function addLinesToEstimate(
   ctx: ZohoFetchContext,
@@ -129,12 +138,17 @@ export async function addLinesToEstimate(
 ): Promise<ZohoEstimate> {
   const existing = await getEstimate(ctx, estimateId);
   const merged = [
-    ...existing.line_items.map((li) => ({
-      item_id: li.item_id,
-      quantity: li.quantity,
-      rate: li.rate,
-      description: li.description,
-    })),
+    ...existing.line_items.map((li) => {
+      const preserved: Record<string, unknown> = {
+        item_id: li.item_id,
+        quantity: li.quantity,
+      };
+      if (li.line_item_id) preserved.line_item_id = li.line_item_id;
+      if (li.rate !== undefined) preserved.rate = li.rate;
+      if (li.description !== undefined) preserved.description = li.description;
+      if (li.name) preserved.name = li.name;
+      return preserved;
+    }),
     ...lineItems.map((li) => ({
       item_id: li.item_id,
       quantity: li.quantity,

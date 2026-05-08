@@ -72,15 +72,33 @@ export async function listItems(
 
 const HARD_PAGE_CAP = 50;
 
+export interface ListAllItemsOptions {
+  /**
+   * Maximum number of pages fetched before giving up. Default 50 (10,000
+   * items at per_page=200). Exposed mainly so tests can pin a small cap.
+   */
+  maxPages?: number;
+}
+
 export async function listAllItems(
   ctx: ZohoFetchContext,
   query: Omit<ListItemsQuery, 'page' | 'per_page'> = {},
+  options: ListAllItemsOptions = {},
 ): Promise<ZohoItem[]> {
+  const maxPages = options.maxPages ?? HARD_PAGE_CAP;
   const all: ZohoItem[] = [];
-  for (let page = 1; page <= HARD_PAGE_CAP; page++) {
+  for (let page = 1; page <= maxPages; page++) {
     const data = await listItems(ctx, { ...query, page, per_page: 200 });
     all.push(...data.items);
-    if (!data.page_context?.has_more_page) break;
+    if (!data.page_context?.has_more_page) return all;
   }
-  return all;
+  // Reached the cap with Zoho still reporting `has_more_page=true`. Throwing
+  // (rather than silently returning a truncated list) is critical because the
+  // catalog mirror generator writes the result to disk as canonical — silent
+  // truncation would shrink the AI extraction surface without any signal.
+  throw new Error(
+    `listAllItems hit page cap (${maxPages} pages × 200 items) but Zoho reports has_more_page=true. ` +
+      `Either Zoho returned malformed pagination, or the org grew past ${maxPages * 200} items — ` +
+      `pass { maxPages: N } to raise the cap.`,
+  );
 }

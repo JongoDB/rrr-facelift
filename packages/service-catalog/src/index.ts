@@ -1,4 +1,4 @@
-export { CATALOG, findById, itemsNeedingRates, QUOTE_RULES } from './catalog.js';
+export { CATALOG, findById, findByZohoItemId, QUOTE_RULES } from './catalog.js';
 export {
   deriveCatalogItem,
   deriveCategory,

@@ -56,12 +56,53 @@ describe('mintAccessToken', () => {
     expect(url).toBe('https://accounts.zoho.eu/oauth/v2/token');
   });
 
-  it('throws a structured error on non-2xx', async () => {
+  it('throws a structured error on non-2xx and surfaces the Zoho error tag', async () => {
     const fetchImpl = vi.fn(async () => {
       return new Response(JSON.stringify({ error: 'invalid_client' }), { status: 400 });
     });
     await expect(mintAccessToken(baseConfig, fetchImpl as unknown as typeof fetch)).rejects.toThrow(
-      /mintAccessToken failed \(400\)/,
+      /mintAccessToken failed \(400\): invalid_client/,
+    );
+  });
+
+  it('throws a clear error when Zoho returns non-JSON (e.g. maintenance HTML)', async () => {
+    const fetchImpl = vi.fn(async () => {
+      return new Response('<html><body>Bad gateway</body></html>', {
+        status: 502,
+        headers: { 'Content-Type': 'text/html' },
+      });
+    });
+    await expect(mintAccessToken(baseConfig, fetchImpl as unknown as typeof fetch)).rejects.toThrow(
+      /returned non-JSON \(502\)/,
+    );
+  });
+
+  it('throws when expires_in is missing (would otherwise produce NaN expiry → re-mint storm)', async () => {
+    const fetchImpl = vi.fn(async () => {
+      return new Response(JSON.stringify({ access_token: 'at', scope: '' }), { status: 200 });
+    });
+    await expect(mintAccessToken(baseConfig, fetchImpl as unknown as typeof fetch)).rejects.toThrow(
+      /invalid expires_in/,
+    );
+  });
+
+  it('throws when expires_in is non-numeric', async () => {
+    const fetchImpl = vi.fn(async () => {
+      return new Response(JSON.stringify({ access_token: 'at', expires_in: 'soon', scope: '' }), {
+        status: 200,
+      });
+    });
+    await expect(mintAccessToken(baseConfig, fetchImpl as unknown as typeof fetch)).rejects.toThrow(
+      /invalid expires_in/,
+    );
+  });
+
+  it('throws when access_token is missing on a 200 response', async () => {
+    const fetchImpl = vi.fn(async () => {
+      return new Response(JSON.stringify({ scope: '' }), { status: 200 });
+    });
+    await expect(mintAccessToken(baseConfig, fetchImpl as unknown as typeof fetch)).rejects.toThrow(
+      /mintAccessToken failed \(200\)/,
     );
   });
 });

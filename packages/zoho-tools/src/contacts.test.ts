@@ -91,6 +91,25 @@ describe('createContact', () => {
     });
     expect(captured.is_sms_enabled).toBe(false);
   });
+
+  it('strips non-digit characters from mobile so voice/chat input is safe', async () => {
+    let captured: Record<string, unknown> = {};
+    const fetchImpl = vi.fn(async (_url, init?: RequestInit) => {
+      captured = JSON.parse(String(init?.body ?? '{}'));
+      return jsonRes(201, {
+        code: 0,
+        message: 'created',
+        contact: { contact_id: 'c-3', contact_name: 'V W', contact_type: 'customer' },
+      });
+    }) as unknown as typeof fetch;
+    await createContact(ctxWith(fetchImpl), {
+      first_name: 'V',
+      last_name: 'W',
+      email: 'v@w.test',
+      mobile: '+1 (704) 555-0142',
+    });
+    expect(captured.mobile).toBe('17045550142');
+  });
 });
 
 describe('getContactHistory', () => {

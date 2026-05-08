@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CATALOG, findById, findByZohoItemId, itemsNeedingRates, QUOTE_RULES } from './catalog.js';
+import { CATALOG, findById, findByZohoItemId, QUOTE_RULES } from './catalog.js';
 
 describe('service catalog (Zoho-mirror)', () => {
   it('is a non-empty mirror of the live Zoho org', () => {
@@ -33,10 +33,6 @@ describe('service catalog (Zoho-mirror)', () => {
     expect(findById('mobile_service_call_fee_flat_rate_10_miles')).toBeDefined();
     expect(findById('mobile_service_call_fee_per_mile_over_10_miles')).toBeDefined();
     expect(findById('inspection_fee')).toBeDefined();
-  });
-
-  it('flags zero items as needing rates after sync', () => {
-    expect(itemsNeedingRates()).toEqual([]);
   });
 
   it('quote rules carry locked-spec values', () => {

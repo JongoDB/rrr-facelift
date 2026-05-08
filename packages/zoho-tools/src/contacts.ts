@@ -117,6 +117,11 @@ export async function createContact(
   ctx: ZohoFetchContext,
   input: CreateContactInput,
 ): Promise<ZohoContact> {
+  // Voice / chat callers may dictate phone in any format ("(704) 555-0142",
+  // "704-555-0142", "+1 704 555 0142"). Zoho rejects non-digit characters in
+  // the `mobile` field with an unhelpful "Invalid value" 400. Normalize once
+  // at this boundary so every caller is safe.
+  const normalizedMobile = input.mobile.replace(/\D+/g, '');
   const payload = {
     contact_name: `${input.first_name} ${input.last_name}`.trim(),
     contact_type: 'customer' as const,
@@ -124,7 +129,7 @@ export async function createContact(
     first_name: input.first_name,
     last_name: input.last_name,
     email: input.email,
-    mobile: input.mobile,
+    mobile: normalizedMobile,
     is_sms_enabled: input.is_sms_enabled ?? true,
     payment_terms: 0,
     payment_terms_label: 'Due on Receipt',

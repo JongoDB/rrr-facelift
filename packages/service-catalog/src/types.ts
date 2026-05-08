@@ -60,8 +60,6 @@ export interface CatalogItem {
   warranty?: CatalogWarranty;
   /** Soft-deleted? Don't show in pickers, keep for historical line items. */
   archived?: boolean;
-  /** Marker for items where the owner still needs to confirm/set the rate. */
-  rateNeedsConfirmation?: boolean;
 }
 
 export interface QuoteRules {

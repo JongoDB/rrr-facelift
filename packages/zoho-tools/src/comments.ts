@@ -141,6 +141,10 @@ export function buildIntakeTemplate(input: IntakeTemplateInput): string {
   }
   if (input.distance_miles !== undefined) {
     lines.push('');
+    // The "m" suffix is verbatim from Jonathan's existing intake template
+    // (planning/14). It stands for miles — NOT meters — even though the SI
+    // symbol for meter is also "m". Don't normalize to "mi" — techs read
+    // these comments daily and any wording change is jarring.
     lines.push(`Distance: ${input.distance_miles} m`);
   }
   if (input.phone || input.email) {

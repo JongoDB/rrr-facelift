@@ -47,11 +47,28 @@ export interface ZohoFetchContext {
   fetchImpl?: typeof fetch;
 }
 
-const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
+const RETRYABLE_5XX = new Set([500, 502, 503, 504]);
+const NON_IDEMPOTENT_METHODS = new Set(['POST', 'PATCH']);
 const DEFAULT_MAX_ATTEMPTS = 4;
 const DEFAULT_BASE_SLEEP_MS = 250;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Decides whether a failed response should be retried.
+ *
+ * - 429 (rate limit) is always retried; Zoho explicitly tells you to.
+ * - 5xx is retried for idempotent methods (GET, HEAD, PUT, DELETE) only.
+ *   POST and PATCH might have already succeeded server-side when the response
+ *   was lost on the wire — retrying could create duplicate estimates,
+ *   invoices, payments, contacts, comments. The audit-log noise alone would
+ *   be bad; the financial impact of duplicate invoices is worse.
+ */
+function isRetryableStatus(status: number, method: string | undefined): boolean {
+  if (status === 429) return true;
+  if (!RETRYABLE_5XX.has(status)) return false;
+  return !NON_IDEMPOTENT_METHODS.has((method ?? 'GET').toUpperCase());
+}
 
 export async function zohoFetch<T = unknown>(
   ctx: ZohoFetchContext,
@@ -88,7 +105,7 @@ export async function zohoFetch<T = unknown>(
       return body as T;
     }
     const err = new ZohoApiError(res.status, path, body, attempt);
-    if (!RETRYABLE_STATUSES.has(res.status) || attempt === maxAttempts) {
+    if (!isRetryableStatus(res.status, options.method) || attempt === maxAttempts) {
       throw err;
     }
     lastError = err;

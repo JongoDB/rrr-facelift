@@ -44,13 +44,3 @@ export function findById(id: string): CatalogItem | undefined {
 export function findByZohoItemId(zohoItemId: string): CatalogItem | undefined {
   return CATALOG.find((item) => item.zohoItemId === zohoItemId);
 }
-
-/**
- * Items where the owner has not yet set a real rate. With the Zoho-canonical
- * model this should always be empty in practice — kept as a safety net so the
- * test suite catches the case where sync ever produces a zero-rate billable
- * item that wasn't intentional (Zoho's `Labor - NO CHARGE` is intentional).
- */
-export function itemsNeedingRates(): readonly CatalogItem[] {
-  return CATALOG.filter((item) => item.rateNeedsConfirmation === true);
-}

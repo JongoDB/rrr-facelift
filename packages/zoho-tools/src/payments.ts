@@ -49,11 +49,23 @@ const PAYMENT_MODE_LABEL: Record<PaymentMethod, string> = {
   other: 'Other',
 };
 
+/**
+ * Format YYYY-MM-DD in the Zoho org's timezone (America/New_York; Salisbury
+ * NC). Using `Date.toISOString().slice(0,10)` would return the UTC date — and
+ * after ~7-8 PM ET that has already rolled to tomorrow. A tech recording
+ * payment in the evening would see the payment dated next-day in Zoho, which
+ * silently breaks month-end revenue reporting. en-CA gives YYYY-MM-DD without
+ * manual padding.
+ */
+function todayInOrgTimezone(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+}
+
 export async function recordPayment(
   ctx: ZohoFetchContext,
   input: RecordPaymentInput,
 ): Promise<ZohoCustomerPayment> {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayInOrgTimezone();
   const payload = {
     customer_id: input.customer_id,
     amount: input.amount,
