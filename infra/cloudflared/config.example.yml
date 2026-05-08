@@ -1,0 +1,16 @@
+# Cloudflare Tunnel config — copied to ~/.cloudflared/config.yml on the VM
+# after `cloudflared tunnel create rrr-vm`.
+#
+# This file is committed as documentation; the running tunnel is configured
+# via the `TUNNEL_TOKEN` env var in docker-compose. See planning/12-human-actions.md
+# for the one-time tunnel-creation steps.
+
+tunnel: REPLACE_WITH_TUNNEL_ID
+credentials-file: /etc/cloudflared/REPLACE_WITH_TUNNEL_ID.json
+
+ingress:
+  - hostname: flows.triple-r-rv.com
+    service: http://caddy:80
+  - hostname: stt.triple-r-rv.com
+    service: http://caddy:80
+  - service: http_status:404

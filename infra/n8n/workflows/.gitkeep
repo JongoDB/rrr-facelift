@@ -1,0 +1,3 @@
+Workflow JSON files land here in Phase 02 onward.
+Each is named `<phase>-<verb>-<subject>.json`, e.g., `02-process-intake-form.json`.
+n8n imports them on container start; UI edits must be exported back here.

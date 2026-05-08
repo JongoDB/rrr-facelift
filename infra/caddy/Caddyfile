@@ -1,0 +1,23 @@
+# Caddy is reached only via Cloudflare Tunnel; TLS is terminated at Cloudflare's edge.
+# Internal routing matches by the Host header set by cloudflared.
+
+{
+  admin off
+  auto_https off
+  servers {
+    protocols h1 h2c
+  }
+}
+
+flows.triple-r-rv.com {
+  reverse_proxy n8n:5678
+}
+
+stt.triple-r-rv.com {
+  reverse_proxy speaches:8000
+}
+
+# Internal-only — used by n8n when an Ollama profile is enabled.
+ollama.internal {
+  reverse_proxy ollama:11434
+}
