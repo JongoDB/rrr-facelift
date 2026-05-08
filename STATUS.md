@@ -28,18 +28,19 @@
 
 Gating Phase 01:
 
-1. **Zoho OAuth credentials** in [apps/api/.env.local](apps/api/.env.local) (gitignored; placeholders already in place) — `ZOHO_REFRESH_TOKEN`, `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_ORG_ID`, `ZOHO_REGION` (likely `com`).
-2. **Catalog-source direction** — confirm whether RRR's Zoho Books org already carries the service items with real rates. If yes (likely), Phase 01 PULLs Zoho → mirrors locally; the placeholder `rate: 0` entries get overwritten from Zoho. If not, we PUSH the placeholder catalog and you fill in rates first.
-3. **Sandbox vs production Zoho org** — assume production with `[TEST]` cleanup tagging unless told otherwise.
+1. **Sandbox vs production Zoho org** — proceeding against production unless told otherwise. Audit was read-only; future writes will tag `[TEST]` records for cleanup.
 
 Useful early (not Phase-01-blocking):
 
-4. **Shop address + lat/long** — for `SHOP_ADDRESS`/`SHOP_LATITUDE`/`SHOP_LONGITUDE` (Phase 02 mileage calc).
+2. **Shop address + lat/long** — for `SHOP_ADDRESS`/`SHOP_LATITUDE`/`SHOP_LONGITUDE` (Phase 02 mileage calc).
 
 Resolved:
 
 - ✅ **GitHub repo created** ([JongoDB/rrr-facelift](https://github.com/JongoDB/rrr-facelift)) and CI green.
 - ✅ **NC + Rowan County tax rate** — set to 6.75% in `QUOTE_RULES.taxRate`. Zoho Books remains the system of record for actual tax application.
+- ✅ **Zoho OAuth credentials** — Self Client created, refresh token minted, scopes granted: `ZohoBooks.{contacts,estimates,invoices,items}.ALL`, `settings.READ`, `customerpayments.CREATE`, `salesorders.ALL`. Stored in [apps/api/.env.local](apps/api/.env.local) (gitignored).
+- ✅ **Zoho org audit complete** — see [planning/14-zoho-org-schema.md](planning/14-zoho-org-schema.md). Big shifts: catalog source-of-truth reversed (Zoho canonical, we mirror), intake template format pinned, comment_type semantics defined, mobile pricing duality documented. Affected docs (`planning/05`, `planning/06`) updated with cross-references.
+- ✅ **Catalog-source direction decided** — Zoho's 364 items are canonical; Phase 01 builds `pnpm sync:catalog` to PULL into a typed local mirror with derived keywords/units/ids.
 
 ## Recently Completed
 

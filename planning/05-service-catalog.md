@@ -1,14 +1,16 @@
 # 05 — Service Catalog Data Model
 
 > The catalog is the foundation. Voice extraction, intake classification, and quote generation all depend on it. Build it once, build it right.
+>
+> ⚠️ **2026-05-08 update:** the audit in [planning/14-zoho-org-schema.md](14-zoho-org-schema.md) revealed RRR's Zoho org already carries 364 mature items with real rates and an established naming convention. The source-of-truth direction below has been **reversed** — Zoho is canonical, our local catalog is a typed mirror with augmentations. Pre-2026-05-08 PUSH-from-TS plan preserved in git history.
 
 ## Source of Truth
 
-- **Canonical catalog:** `packages/service-catalog/src/catalog.ts` (typed TS)
-- **Mirror in Zoho Books:** items table (synced via `pnpm seed:catalog` script, idempotent)
-- **Cache for fast reads:** Postgres `items` table (synced hourly from Zoho)
+- **Canonical catalog:** **Zoho Books items** (read via `/items` endpoint).
+- **Local typed mirror:** `packages/service-catalog/src/catalog.generated.ts` — produced by `pnpm sync:catalog` from the live org. Carries normalized fields Zoho can't store: AI extraction `keywords`, parsed `unit` (Zoho's unit field is unused; units live inside the item name), our internal dotted `id` taxonomy, derived `kind` and `category`.
+- **Cache for fast reads:** Postgres `items` table (refreshed hourly by an n8n workflow).
 
-The TS file is edited by humans (or Claude with explicit approval). The seed script pushes additions/updates to Zoho. The hourly sync pulls Zoho item IDs back into the cache for use in Claude tool calls.
+The Zoho catalog is edited in Zoho UI by RRR staff. `pnpm sync:catalog` PULLS into the local mirror, then enriches each entry with keywords / unit / id / category derived by name pattern (e.g. `Parts - Roof membrane (per linear ft)` → `kind: 'part'`, `unit: 'linear_ft'`, derived id `parts.roof_membrane`). Anything we want to add that Zoho doesn't track lives in the local enrichment layer — never pushed back to Zoho.
 
 ## Item Types
 

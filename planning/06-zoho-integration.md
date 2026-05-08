@@ -1,5 +1,7 @@
 # 06 — Zoho Books Integration
 
+> 📎 **Companion doc:** [planning/14-zoho-org-schema.md](14-zoho-org-schema.md) is the discovered schema of RRR's live Zoho org. Read it first; it explains the conventions our tools must match (item-name-as-category, `comment_type=internal` for tech notes, the structured intake template Jonathan posts on every estimate, the bundled-vs-itemized mobile pricing duality, RV info in the customer `notes` field, no custom fields available).
+
 ## OAuth Setup (One-Time)
 
 Zoho uses OAuth2 with refresh tokens. The flow:
@@ -316,6 +318,61 @@ When voice transcripts are involved (Phase 05), append:
 ```
 The user message below is a transcript of the tech speaking. They are describing work performed (for an invoice) or work to be performed (for an estimate). Extract line items mapping to the catalog. Be liberal with calling search_items — try multiple keyword variations if needed. Confirm ambiguous items.
 ```
+
+## Comment-type semantics (added 2026-05-08)
+
+Zoho exposes three comment types on estimates and invoices. Our tools must distinguish them — see planning/14 for examples from the live org:
+
+| `comment_type` | Who creates | Visible to customer | Our tools |
+|----------------|-------------|---------------------|-----------|
+| `system` | Zoho Books / editing user (audit log) | No | Read-only; never post |
+| `internal` | RRR staff | No | **Primary tech-note channel.** All voice transcripts, parts/cost lookups, and the structured intake template post here. |
+| `customer` | RRR staff | Yes | Use sparingly — only when the tech specifies "send this to the customer". |
+
+Tools to add to the inventory above:
+
+- `add_internal_comment(document_type, document_id, text)` — `comment_type=internal`. The voice flow's default target until the tech says "build line items from this."
+- `add_customer_comment(document_type, document_id, text)` — explicit, customer-facing.
+- `get_internal_comments(document_type, document_id)` — read tech context for "what did we last note for this customer?".
+
+## Intake template (added 2026-05-08)
+
+The intake-form workflow (Phase 02) creates a draft estimate and posts an `internal` comment matching the existing template Jonathan uses by hand today. Verbatim format (sample evidence in `audit/zoho/{estimate,invoice}-comments-*.json`):
+
+```text
+{SERVICE_TYPE} REQUESTED [FOR {DATE} {TIME}]
+
+RV Info: {YEAR} {MAKE} {MODEL}[, {LENGTH} ft]
+VIN: {VIN_OR_"unsure"}
+
+Customer Statement: {customer's free-text problem description}
+
+Service Address: {street, city, state zip}     ← mobile only
+Gate Code (Optional): {code}
+Parking Instructions (Optional): {notes}
+
+Distance: {miles} m                             ← mobile only
+
+Phone: {phone}
+Email: {email}
+```
+
+`SERVICE_TYPE` ∈ `{ROUTINE MOBILE SERVICE, EMERGENCY MOBILE SERVICE, ON-SITE SERVICE}`. Owner sees the same artefact they're used to — auto-generated from the website intake submission.
+
+## Mobile pricing model (added 2026-05-08)
+
+Two valid ways to bill mobile service in this org. Voice / chat flows must pick correctly:
+
+**Bundled (1-hour scheduled appointment):**
+- One line: `Labor - Mobile Service (Routine) (Appointment with Service Call Fee)` qty=1 rate=$228 (or `(Emergency/After-Hours)` @ $263).
+- Description carries the appointment time and the payment-before-appointment disclaimer.
+
+**Itemized (variable-time work after the fact):**
+- `Labor - Mobile Service (Routine)` qty=hours rate=$129 (or `Emergency/After-Hours` @ $164).
+- `Mobile Service Call Fee (Flat Rate) - 10 MILES` qty=1 rate=$99.
+- `Mobile Service Call Fee (Per Mile) - OVER 10 MILES` qty=miles_over_10 rate=$2.70 (only when applicable).
+
+Default: scheduled 1-hr appointments → bundled. Tech describing actual work time → itemized. Voice-mode system prompt must surface both options to Claude with the selection rule.
 
 ## Webhooks (Inbound from Zoho)
 
