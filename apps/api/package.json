@@ -11,7 +11,9 @@
     "@rrr/agent": "workspace:*",
     "@rrr/service-catalog": "workspace:*",
     "@rrr/shared": "workspace:*",
-    "@rrr/zoho-tools": "workspace:*"
+    "@rrr/zoho-tools": "workspace:*",
+    "hono": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "typescript": "catalog:",
