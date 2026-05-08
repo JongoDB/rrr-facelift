@@ -26,6 +26,7 @@ You are the lead engineer building an end-to-end automation platform for **RRR C
 @planning/12-human-actions.md
 @planning/13-secrets-manifest.md
 @planning/14-zoho-org-schema.md
+@planning/15-zoho-flow-current.md
 
 ## Hard Rules
 

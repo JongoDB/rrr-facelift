@@ -26,6 +26,7 @@
     "infra:down": "docker compose -f infra/docker-compose.yml down",
     "zoho:mint": "node scripts/zoho-mint-refresh-token.mjs",
     "zoho:audit": "node scripts/zoho-audit.mjs",
+    "sync:catalog": "tsx scripts/sync-zoho-catalog.ts",
     "prepare": "node -e \"console.log('rrr-automation workspace ready')\""
   },
   "devDependencies": {
@@ -33,6 +34,7 @@
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "tsx": "^4.21.0",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
