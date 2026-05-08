@@ -52,3 +52,6 @@ snapshots/content/
 infra/.data/
 *.sqlite
 *.sqlite3
+
+# Live-data audits (Zoho dumps include customer PII + financials)
+audit/
