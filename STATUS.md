@@ -6,7 +6,7 @@
 
 - **Active Phase:** `phase-01-zoho-foundation` ✅ complete locally · awaiting PR review
 - **Repo:** [JongoDB/rrr-facelift](https://github.com/JongoDB/rrr-facelift) (public)
-- **Branch + PR:** `phase-01/zoho-foundation` — see PR link in [wrapups/phase-01-zoho-foundation.md](wrapups/phase-01-zoho-foundation.md)
+- **Branch + PR:** [`phase-01/zoho-foundation` → PR #1](https://github.com/JongoDB/rrr-facelift/pull/1)
 - **Wrap-up:** [wrapups/phase-01-zoho-foundation.md](wrapups/phase-01-zoho-foundation.md)
 - **Status:** 🟡 awaiting PR review + sandbox-vs-production confirmation before Phase 02 starts
 

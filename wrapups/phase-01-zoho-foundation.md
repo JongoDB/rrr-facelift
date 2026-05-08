@@ -4,7 +4,7 @@
 
 **Phase status:** ✅ complete (all locally-verifiable deliverables in place; live `[TEST]`-tagged integration sweep deferred to a Phase-02 sanity step)
 **Date:** 2026-05-08
-**Branch / PR:** `phase-01/zoho-foundation` → PR opened against `main` (link below)
+**Branch / PR:** `phase-01/zoho-foundation` → [PR #1](https://github.com/JongoDB/rrr-facelift/pull/1)
 **Time spent:** ~2 sessions
 
 ---
@@ -178,7 +178,7 @@ What's NOT verified live yet (deferred):
 
 ## Files / Links Reference
 
-- **PR:** see [STATUS.md](STATUS.md) for the link once opened
+- **PR:** [#1 — Phase 01 Zoho foundation](https://github.com/JongoDB/rrr-facelift/pull/1)
 - Tool surface: [packages/zoho-tools/src/](packages/zoho-tools/src/)
 - Catalog mirror: [packages/service-catalog/src/catalog.generated.ts](packages/service-catalog/src/catalog.generated.ts)
 - Catalog deriver: [packages/service-catalog/src/derive.ts](packages/service-catalog/src/derive.ts)
