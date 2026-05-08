@@ -45,5 +45,5 @@ Cosmetic (not Phase-01-blocking, useful early):
 ## Notes
 
 - Project kicked off: 2026-05-08 (Phase 00 session).
-- Owner contact: fightingsmartcyber@gmail.com.
-- All 5 Phase-00 commits live on `main` (`be0110a..2027eca`); subsequent phases follow the `phase-NN/<short>` branch convention from CLAUDE.md.
+- Owner contact: see GitHub repo owner / private channel.
+- All Phase-00 commits live on `main`; subsequent phases follow the `phase-NN/<short>` branch convention from CLAUDE.md.
