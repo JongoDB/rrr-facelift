@@ -1,0 +1,28 @@
+# Cloudflare Workers config for apps/api.
+# Account ID and route are wired up in Phase 02 once the domain is on Cloudflare.
+
+name = "rrr-api"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Production route (uncomment when domain is migrated in Phase 03):
+# route = { pattern = "api.triple-r-rv.com/*", zone_name = "triple-r-rv.com" }
+
+[vars]
+# Non-secret environment values. Real ones set per-environment in CF dashboard.
+ZOHO_REGION = "com"
+APP_URL = "https://app.triple-r-rv.com"
+WEB_URL = "https://triple-r-rv.com"
+
+# Secrets are set via:
+#   wrangler secret put ZOHO_REFRESH_TOKEN
+#   wrangler secret put ZOHO_CLIENT_ID
+#   wrangler secret put ZOHO_CLIENT_SECRET
+#   wrangler secret put ZOHO_ORG_ID
+#   wrangler secret put ANTHROPIC_API_KEY
+#   wrangler secret put JWT_SECRET
+#   wrangler secret put RESEND_API_KEY
+#   wrangler secret put TWILIO_ACCOUNT_SID
+#   wrangler secret put TWILIO_AUTH_TOKEN
+#   wrangler secret put DATABASE_URL
