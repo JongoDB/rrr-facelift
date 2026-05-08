@@ -312,8 +312,9 @@ export const QUOTE_RULES: QuoteRules = {
     advanceNoticeDays: MOBILE_ADVANCE_NOTICE_DAYS,
     paymentDueHoursBefore: MOBILE_PAYMENT_DUE_HOURS_BEFORE,
   },
-  // Phase 01: owner confirms NC state + Rowan County combined rate.
-  taxRate: 0,
+  // NC state + Rowan County combined rate. Zoho Books is the system of record
+  // for tax application; this constant is for client-side preview totals only.
+  taxRate: 0.0675,
 };
 
 /** Map an internal catalog id to the full item definition. */

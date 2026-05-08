@@ -30,13 +30,16 @@ Gating Phase 01 (full detail in [wrapups/phase-00-foundation.md](wrapups/phase-0
 
 1. **GitHub repo location decision + push** — needed to verify CI pipeline.
 2. **Zoho OAuth credentials** — `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`, `ZOHO_ORG_ID`, `ZOHO_REGION`.
-3. **Confirmed catalog rates** for 18 items currently flagged with `rateNeedsConfirmation: true` in [packages/service-catalog/src/catalog.ts](packages/service-catalog/src/catalog.ts).
-4. **NC + Rowan County combined tax rate** — set `QUOTE_RULES.taxRate`.
-5. **Sandbox vs production Zoho org** decision.
+3. **Confirmed catalog rates / Zoho-first sync decision** — see Phase 01 plan; if RRR's Zoho org already holds the items with real rates, we PULL from Zoho rather than asking the owner to re-enter them.
+4. **Sandbox vs production Zoho org** decision.
 
 Cosmetic (not Phase-01-blocking, useful early):
 
-6. **Shop address + lat/long** — for `SHOP_ADDRESS`/`SHOP_LATITUDE`/`SHOP_LONGITUDE` env vars used in Phase 02 mileage calc.
+5. **Shop address + lat/long** — for `SHOP_ADDRESS`/`SHOP_LATITUDE`/`SHOP_LONGITUDE` env vars used in Phase 02 mileage calc.
+
+Resolved:
+
+- ✅ **NC + Rowan County tax rate** — set to 6.75% in `QUOTE_RULES.taxRate`. Zoho Books remains the system of record for actual tax application.
 
 ## Recently Completed
 
