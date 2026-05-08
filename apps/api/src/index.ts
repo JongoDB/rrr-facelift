@@ -10,7 +10,10 @@
  *   POST /zoho/record-payment            — n8n auth
  *   GET  /zoho/items                     — n8n auth
  *   GET  /zoho/contacts/:id/history      — n8n auth
- *   POST /agent/classify-intake          — n8n auth (Phase 02 chunk 1: stub)
+ *   POST /agent/classify-intake          — n8n auth (Haiku via @rrr/agent;
+ *                                          falls back to a stub heuristic
+ *                                          when ANTHROPIC_API_KEY is unset)
+ *   POST /agent/calculate-mileage        — n8n auth (Nominatim geocoder)
  *
  * The PWA's authenticated endpoints land in Phase 04 with magic-link JWT
  * middleware on a separate router (e.g. /pwa/*).

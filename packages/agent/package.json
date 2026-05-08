@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.95.1",
     "@rrr/service-catalog": "workspace:*",
     "@rrr/shared": "workspace:*",
     "@rrr/zoho-tools": "workspace:*"
