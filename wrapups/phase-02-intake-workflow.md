@@ -4,7 +4,7 @@
 
 **Phase status:** ⏸️ partial — Worker side feature-complete; n8n workflow JSON + live end-to-end intake deferred until the Docker stack runs (which needs Cloudflare Tunnel + Twilio + Resend setup — owner-only steps).
 **Date:** 2026-05-08
-**Branch / PR:** `phase-02/intake-workflow` → PR opened against `main` (link below)
+**Branch / PR:** `phase-02/intake-workflow` → [PR #2](https://github.com/JongoDB/rrr-facelift/pull/2)
 **Time spent:** ~1 session
 
 ---
@@ -172,7 +172,7 @@ What's NOT verified live yet (deferred per "Blocked On"):
 
 ## Files / Links Reference
 
-- **PR:** see [STATUS.md](STATUS.md) for the link once opened
+- **PR:** [#2 — Phase 02 chunks 1+2 Worker routes](https://github.com/JongoDB/rrr-facelift/pull/2)
 - Worker entry: [apps/api/src/index.ts](apps/api/src/index.ts)
 - Auth middleware: [apps/api/src/middleware/auth.ts](apps/api/src/middleware/auth.ts)
 - /zoho routes: [apps/api/src/routes/zoho.ts](apps/api/src/routes/zoho.ts)

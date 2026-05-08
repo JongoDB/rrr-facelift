@@ -6,7 +6,7 @@
 
 - **Active Phase:** `phase-02-intake-workflow` ⏸️ partial — Worker side feature-complete; n8n workflow JSON + live e2e await Docker stack
 - **Repo:** [JongoDB/rrr-facelift](https://github.com/JongoDB/rrr-facelift) (public)
-- **Branch + PR:** `phase-02/intake-workflow` — see PR link in [wrapups/phase-02-intake-workflow.md](wrapups/phase-02-intake-workflow.md)
+- **Branch + PR:** [`phase-02/intake-workflow` → PR #2](https://github.com/JongoDB/rrr-facelift/pull/2)
 - **Wrap-up:** [wrapups/phase-02-intake-workflow.md](wrapups/phase-02-intake-workflow.md)
 - **Status:** 🟡 awaiting Cloudflare Tunnel + Twilio + Resend before the live intake workflow can be wired end-to-end
 
