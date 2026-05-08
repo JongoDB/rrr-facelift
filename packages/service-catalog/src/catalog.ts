@@ -5,300 +5,18 @@ import {
   MOBILE_ADVANCE_NOTICE_DAYS,
   MOBILE_PAYMENT_DUE_HOURS_BEFORE,
 } from '@rrr/shared';
+import { GENERATED_CATALOG } from './catalog.generated.js';
 import type { CatalogItem, QuoteRules } from './types.js';
 
 /**
- * Initial catalog seed. Sourced from planning/05-service-catalog.md and RRR's
- * published pricing. Items marked `rateNeedsConfirmation: true` need the owner
- * to set the actual dollar value in Phase 01 before `pnpm seed:catalog` runs.
+ * The local catalog mirror — sourced from RRR's Zoho Books org via
+ * `pnpm sync:catalog`. Zoho is canonical; this file re-exports the generated
+ * snapshot and layers on derived helpers and the QUOTE_RULES that govern
+ * client-side preview totals.
+ *
+ * To refresh after Zoho-side edits: `pnpm sync:catalog && pnpm test`.
  */
-export const CATALOG: readonly CatalogItem[] = [
-  // ── Labor & fees ──────────────────────────────────────────────────────────
-  {
-    id: 'labor.standard',
-    name: 'Standard Labor',
-    kind: 'labor',
-    unit: 'hour',
-    rate: 0,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['labor', 'work', 'hours', 'man hours', 'standard rate'],
-    category: 'labor',
-  },
-  {
-    id: 'labor.afterhours',
-    name: 'Emergency / After-Hours Labor',
-    kind: 'labor',
-    unit: 'hour',
-    rate: 0,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['emergency', 'after hours', 'after-hours', 'overtime', 'rush'],
-    category: 'labor',
-  },
-  {
-    id: 'fee.trip.local',
-    name: 'Local Service Call (≤10 mi)',
-    kind: 'fee',
-    unit: 'flat',
-    rate: 99,
-    taxable: false,
-    description: 'Auto-applied to mobile jobs within the free-radius mileage.',
-    keywords: ['trip fee', 'service call', 'travel fee'],
-    category: 'fee',
-  },
-  {
-    id: 'fee.trip.mileage',
-    name: 'Additional Mileage',
-    kind: 'fee',
-    unit: 'mile',
-    rate: MILEAGE_RATE_PER_MILE_OVER,
-    taxable: false,
-    description: 'Auto-applied for miles over the free radius.',
-    keywords: ['mileage', 'miles', 'travel'],
-    category: 'fee',
-  },
-
-  // ── Roof services ─────────────────────────────────────────────────────────
-  {
-    id: 'roof.reseal.peel_seal',
-    name: 'Peel-and-Seal Reseal (EPDM/TPO)',
-    kind: 'service',
-    unit: 'linear_ft',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: [
-      'reseal',
-      'peel and seal',
-      'lap sealant',
-      'sealed seams',
-      'sealed roof',
-      'roof sealing',
-    ],
-    category: 'roof',
-    warranty: { months: 12, covers: 'Resealed seams against water intrusion' },
-  },
-  {
-    id: 'roof.protrusion.reseal',
-    name: 'Protrusion Reseal (vent, antenna, AC)',
-    kind: 'service',
-    unit: 'each',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['vent', 'antenna', 'protrusion', 'roof penetration', 'ac shroud'],
-    category: 'roof',
-  },
-
-  // ── Common parts ──────────────────────────────────────────────────────────
-  {
-    id: 'parts.dicor_sl',
-    name: 'Dicor Self-Leveling Lap Sealant',
-    kind: 'part',
-    unit: 'tube',
-    rate: 0,
-    rateNeedsConfirmation: true,
-    taxable: true,
-    keywords: ['dicor', 'self leveling', 'self-leveling', 'lap sealant tube', 'roof sealant tube'],
-    category: 'parts',
-  },
-  {
-    id: 'parts.eternabond',
-    name: 'EternaBond Tape',
-    kind: 'part',
-    unit: 'linear_ft',
-    rate: 0,
-    rateNeedsConfirmation: true,
-    taxable: true,
-    keywords: ['eternabond', 'roof tape', 'seam tape'],
-    category: 'parts',
-  },
-  {
-    id: 'parts.vent_gasket',
-    name: 'Vent Gasket',
-    kind: 'part',
-    unit: 'each',
-    rate: 0,
-    rateNeedsConfirmation: true,
-    taxable: true,
-    keywords: ['vent gasket', 'vent gaskets', 'gasket on the vent'],
-    category: 'parts',
-  },
-  {
-    id: 'parts.butyl_tape',
-    name: 'Butyl Tape',
-    kind: 'part',
-    unit: 'linear_ft',
-    rate: 0,
-    rateNeedsConfirmation: true,
-    taxable: true,
-    keywords: ['butyl', 'butyl tape', 'putty tape'],
-    category: 'parts',
-  },
-
-  // ── Towing setup ──────────────────────────────────────────────────────────
-  {
-    id: 'tow.baseplate.install',
-    name: 'Base Plate Installation (Phase 1)',
-    kind: 'service',
-    unit: 'flat',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['base plate', 'baseplate', 'tow plate'],
-    category: 'towing',
-  },
-  {
-    id: 'tow.brakes.install',
-    name: 'Braking System Installation (Phase 2)',
-    kind: 'service',
-    unit: 'flat',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['braking system', 'tow brakes', 'supplemental braking'],
-    category: 'towing',
-  },
-  {
-    id: 'tow.lights.install',
-    name: 'Light Kit Installation (Phase 3)',
-    kind: 'service',
-    unit: 'flat',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['light kit', 'tow lights', 'wiring harness'],
-    category: 'towing',
-  },
-
-  // ── Diagnostics ───────────────────────────────────────────────────────────
-  {
-    id: 'elec.diagnostic',
-    name: 'Electrical Diagnostic',
-    kind: 'labor',
-    unit: 'hour',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['electrical', 'diagnostic', 'wiring issue', '12v', '120v', 'shore power'],
-    category: 'electrical',
-  },
-  {
-    id: 'plumb.diagnostic',
-    name: 'Plumbing Diagnostic',
-    kind: 'labor',
-    unit: 'hour',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['plumbing', 'leak check', 'water lines'],
-    category: 'plumbing',
-  },
-  {
-    id: 'mech.diagnostic',
-    name: 'Mechanical Diagnostic',
-    kind: 'labor',
-    unit: 'hour',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['mechanical', 'engine', 'generator'],
-    category: 'mechanical',
-  },
-
-  // ── Inspections / winterization / water damage ────────────────────────────
-  {
-    id: 'inspect.full',
-    name: 'Full RV Inspection',
-    kind: 'service',
-    unit: 'flat',
-    rate: 0,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    description: '24-hour written report turnaround.',
-    keywords: ['inspection', 'pre-purchase', 'full inspection'],
-    category: 'inspection',
-  },
-  {
-    id: 'inspect.walkthrough',
-    name: 'Complimentary Walkthrough',
-    kind: 'service',
-    unit: 'flat',
-    rate: 0,
-    taxable: false,
-    description: 'Included free with a paid inspection.',
-    keywords: ['walkthrough', 'orientation', 'complimentary'],
-    category: 'inspection',
-  },
-  {
-    id: 'winter.complete',
-    name: 'Complete Winterization',
-    kind: 'service',
-    unit: 'flat',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['winterize', 'winterization', 'pink antifreeze'],
-    category: 'winterization',
-  },
-  {
-    id: 'winter.dewinter',
-    name: 'De-Winterization',
-    kind: 'service',
-    unit: 'flat',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['de-winterize', 'dewinterize', 'open up', 'spring prep'],
-    category: 'winterization',
-  },
-  {
-    id: 'water_damage.assessment',
-    name: 'Water Damage Assessment',
-    kind: 'labor',
-    unit: 'hour',
-    rate: 0,
-    rateIsDefault: true,
-    rateNeedsConfirmation: true,
-    taxable: false,
-    keywords: ['water damage', 'soft floor', 'delamination', 'rot'],
-    category: 'water_damage',
-  },
-
-  // ── Discounts ─────────────────────────────────────────────────────────────
-  {
-    id: 'discount.review',
-    name: 'Google Review Discount (10%)',
-    kind: 'discount',
-    unit: 'flat',
-    rate: 0,
-    taxable: false,
-    description: 'Applied at totals level after a verified Google review is left.',
-    keywords: ['review discount', 'google review'],
-    category: 'discount',
-  },
-  {
-    id: 'discount.referral',
-    name: 'Referral Discount',
-    kind: 'discount',
-    unit: 'flat',
-    rate: -50,
-    taxable: false,
-    keywords: ['referral', 'referred by'],
-    category: 'discount',
-  },
-];
+export const CATALOG: readonly CatalogItem[] = GENERATED_CATALOG;
 
 export const QUOTE_RULES: QuoteRules = {
   laborMinimumHours: LABOR_MINIMUM_HOURS,
@@ -317,12 +35,22 @@ export const QUOTE_RULES: QuoteRules = {
   taxRate: 0.0675,
 };
 
-/** Map an internal catalog id to the full item definition. */
+/** Look up a catalog item by its derived internal id (e.g. `inspection_fee`). */
 export function findById(id: string): CatalogItem | undefined {
   return CATALOG.find((item) => item.id === id);
 }
 
-/** Items that still need a rate set before seeding to Zoho. */
+/** Look up a catalog item by its Zoho item_id (the field Zoho returns on lines). */
+export function findByZohoItemId(zohoItemId: string): CatalogItem | undefined {
+  return CATALOG.find((item) => item.zohoItemId === zohoItemId);
+}
+
+/**
+ * Items where the owner has not yet set a real rate. With the Zoho-canonical
+ * model this should always be empty in practice — kept as a safety net so the
+ * test suite catches the case where sync ever produces a zero-rate billable
+ * item that wasn't intentional (Zoho's `Labor - NO CHARGE` is intentional).
+ */
 export function itemsNeedingRates(): readonly CatalogItem[] {
   return CATALOG.filter((item) => item.rateNeedsConfirmation === true);
 }
