@@ -1,21 +1,45 @@
 import { describe, expect, it } from 'vitest';
-import worker from './index.js';
+import type { Env } from './env.js';
+import app from './index.js';
 
-describe('apps/api stub worker', () => {
-  it('responds with health JSON on /healthz', async () => {
-    const req = new Request('https://api.example.test/healthz');
-    const res = await worker.fetch(req, { ZOHO_REGION: 'com' });
+const env: Env = {
+  ZOHO_REFRESH_TOKEN: 'rt',
+  ZOHO_CLIENT_ID: 'cid',
+  ZOHO_CLIENT_SECRET: 'cs',
+  ZOHO_ORG_ID: 'org-1',
+  ZOHO_REGION: 'com',
+  RRR_INTERNAL_API_KEY: 'unit-test-key',
+};
+
+describe('apps/api root', () => {
+  it('GET /healthz is public and returns the resolved Zoho URL', async () => {
+    const res = await app.fetch(new Request('http://x/healthz'), env);
     expect(res.status).toBe(200);
     const body = (await res.json()) as { ok: boolean; phase: string; zoho_base_url: string };
     expect(body.ok).toBe(true);
-    expect(body.phase).toBe('00-foundation');
+    expect(body.phase).toBe('02-intake-workflow');
     expect(body.zoho_base_url).toContain('zohoapis.com');
   });
 
-  it('responds with the placeholder string at root', async () => {
-    const req = new Request('https://api.example.test/');
-    const res = await worker.fetch(req, {});
-    expect(res.status).toBe(200);
-    expect(await res.text()).toContain('phase 00 stub');
+  it('returns 404 on unknown paths', async () => {
+    const res = await app.fetch(new Request('http://x/nope'), env);
+    expect(res.status).toBe(404);
+  });
+
+  it('GET /zoho/items requires the internal API key', async () => {
+    const res = await app.fetch(new Request('http://x/zoho/items'), env);
+    expect(res.status).toBe(401);
+  });
+
+  it('POST /agent/classify-intake requires the internal API key', async () => {
+    const res = await app.fetch(
+      new Request('http://x/agent/classify-intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      }),
+      env,
+    );
+    expect(res.status).toBe(401);
   });
 });
